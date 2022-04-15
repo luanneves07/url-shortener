@@ -17,10 +17,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api', apiRouter);
-app.get('/', (req, res) => {
-    res.sendFile('public/index.html', { root: __dirname });
-});
+app.use('/', apiRouter);
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}/`);
