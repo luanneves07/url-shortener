@@ -31,11 +31,11 @@ apiRouter.get(`${endpoint}:shortenedUrl`, (req, res) => {
             if (urls.length) {
                 res.redirect(statusCode.StatusCodes.MOVED_PERMANENTLY, urls[0].original_url);
             } else {
-                res.status(404).json({ message: 'URL not found' });
+                res.status(statusCode.StatusCodes.NOT_FOUND).json({ message: 'URL not found' });
             }
         })
         .catch(err => {
-            res.status(500).json({
+            res.status(statusCode.StatusCodes.INTERNAL_SERVER_ERROR).json({
                 message: `Error finding the URL ${shortenedUrl} - ${err.message}`
             });
         });
