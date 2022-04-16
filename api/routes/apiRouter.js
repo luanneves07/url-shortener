@@ -52,7 +52,7 @@ apiRouter.post(`${endpoint}api/${version}/shorten`, async (req, res) => {
                 original_url: original_url,
                 shortened_url: shortenerUniqueID
             }
-            // await amqp.publishToQueue('db-insert-queue', JSON.stringify(shortenedData));
+            await amqp.publishToQueue('db-insert-queue', JSON.stringify(shortenedData));
             res.status(statusCode.StatusCodes.OK).json(shortenedData);
         } else {
             res.status(statusCode.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Error generating a new URL. Try again later." });
