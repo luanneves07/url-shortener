@@ -3,13 +3,11 @@ const apiRouter = express.Router();
 const path = require('path');
 const statusCode = require('http-status-codes');
 
-const { request } = require('undici');
 const amqp = require('../../services/mqservices');
 amqp.connect(() => {
     console.log("Connection with Rabbitmq was successful");
 });
 
-const generatorEndpoint = process.env.URL_GENERATOR_ENDPOINT;
 const endpoint = '/';
 const version = 'v0';
 const database = require('../../db/database');
@@ -44,20 +42,11 @@ apiRouter.get(`${endpoint}:shortenedUrl`, (req, res) => {
 apiRouter.post(`${endpoint}api/${version}/shorten`, async (req, res) => {
     if (req.body) {
         const { original_url } = req.body;
-        const { body } = await request(generatorEndpoint);
-        const shortenedUrl = await body.json();
-        const shortenerUniqueID = shortenedUrl.shortened_url;
-        if (shortenerUniqueID !== '-1') {
-            const shortenedData = {
-                original_url: original_url,
-                shortened_url: shortenerUniqueID
-            }
-            await amqp.publishToQueue('db-insert-queue', JSON.stringify(shortenedData));
-            res.status(statusCode.StatusCodes.OK).json(shortenedData);
-        } else {
-            res.status(statusCode.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Error generating a new URL. Try again later." });
+        const shortenedData = {
+            original_url: original_url,
         }
-
+        await amqp.publishToQueue('db-insert-queue', JSON.stringify(shortenedData));
+        res.status(statusCode.StatusCodes.OK).json(shortenedData);
     } else {
         res.send({ message: "empty body" });
     }
