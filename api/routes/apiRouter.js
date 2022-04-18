@@ -42,11 +42,12 @@ apiRouter.get(`${endpoint}:shortenedUrl`, (req, res) => {
 apiRouter.post(`${endpoint}api/${version}/shorten`, async (req, res) => {
     if (req.body) {
         const { original_url } = req.body;
-        const shortenedData = {
+        const originalUrlData = {
             original_url: original_url,
         }
-        await amqp.publishToQueue('db-insert-queue', JSON.stringify(shortenedData));
-        res.status(statusCode.StatusCodes.OK).json(shortenedData);
+        await amqp.publishToQueue('db-insert-queue', JSON.stringify(originalUrlData));
+        const message = { message: `Congratulations! Your URL is beeing processed. Soon you will be able to see all it by accessing the following endpoint ${endpoint}api/${version}/urls` };
+        res.status(statusCode.StatusCodes.OK).json(message);
     } else {
         res.send({ message: "empty body" });
     }
